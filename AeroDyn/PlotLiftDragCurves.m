@@ -132,13 +132,18 @@ if ~isempty(indx)
     titleFileText=titleFileText((indx+length(FASTv8Text)):end);
 end
 
+indx=strfind(titleFileText,'with');
+if ~isempty(indx)
+    titleFileText=titleFileText(1:indx-1);
+end
+
+
 %% ------------------------------------------------------------------------
 % initialize data to save for output
 
 outData = getADOutData ( data, columnTitles, BlOutNd );
 
 %%
-
 for iNode = 1:length( outData{ReferenceFile}.node )
     
     f=figure;
@@ -151,19 +156,29 @@ for iNode = 1:length( outData{ReferenceFile}.node )
         
         indx = outData{iFile}.node == n & outData{iFile}.blade == b;
         
-        if sum(indx) == 1
-            
-            OneGraph( outData{iFile}.alpha{indx}, outData{iFile}.cl{indx}, iFile, 1, fileDesc{iFile}, 'lift', titleText, LineColors, Markers );
-            OneGraph( outData{iFile}.alpha{indx}, outData{iFile}.cd{indx}, iFile, 2, fileDesc{iFile}, 'drag', titleText, LineColors, Markers );
-            OneGraph( outData{iFile}.alpha{indx}, outData{iFile}.cm{indx}, iFile, 3, fileDesc{iFile}, 'pitching-moment', titleText, LineColors, Markers );
-                                     
+        if sum(indx) == 1            
+                OneGraph( outData{iFile}.alpha{indx}, outData{iFile}.cl{indx}, iFile, 1, fileDesc{iFile}, 'lift', titleText, LineColors, Markers );
+                OneGraph( outData{iFile}.alpha{indx}, outData{iFile}.cd{indx}, iFile, 2, fileDesc{iFile}, 'drag', titleText, LineColors, Markers );
+            if ~isempty(outData{iFile}.cm)
+                OneGraph( outData{iFile}.alpha{indx}, outData{iFile}.cm{indx}, iFile, 3, fileDesc{iFile}, 'pitching-moment', titleText, LineColors, Markers );
+            end                    
         end                  
     end
     
-    for i=1:3
+
+    [~, tmp ] = fileparts( dataFiles{ReferenceFile} );    
+    outPNGName = [tmp '_' num2str(iNode)];
+    
+    set(f,'Name',outPNGName ...
+             ,'paperorientation','landscape' ...
+             ,'paperposition',[0.25 0.25 10.5 8]);  
+    
+    for i=3
         subplot(2,2,i)
         legend show
     end
+    
+%     saveFigureAsPNG( f, outPNGName, '.' )
     
 end
 
@@ -174,6 +189,8 @@ end
 function OneGraph( x, y, iFile, iPlot, fileDesc, ytxt, titleText, LineColors, Markers )
 
     FntSz          = 17;
+    startupColor = {'r','m'};
+    
 
     %note issue if iFile > 6!
     
@@ -182,18 +199,27 @@ function OneGraph( x, y, iFile, iPlot, fileDesc, ytxt, titleText, LineColors, Ma
         plot(x, y ...
              ,'Marker',Markers{iFile} ...
              ,'MarkerSize',4 ...
-             ,'LineStyle','none' ...
+             ,'LineStyle','-' ...
              ,'DisplayName',fileDesc ...
-             ,'Color',LineColors{iFile} ); ...
+             ,'Color',LineColors{iFile} ); 
         hold on;      
         ylabel([ ytxt ' coefficient (-)'],'FontSize',FntSz);                          
         xlabel('angle of attack (deg)','FontSize',FntSz);                         
-        title( titleText,'FontSize',FntSz )    
+        title( titleText,'FontSize',12 )    
         grid on;
-        set(gca,'FontSize',FntSz-2,'gridlinestyle','-');
+        set(gca,'FontSize',12,'gridlinestyle','-');
+
+        indx=1:100;
+%        plot(x(indx), y(indx) ...
+%             ,'Marker',Markers{iFile} ...
+%             ,'MarkerSize',4 ...
+%             ,'LineStyle',':' ...
+%             ,'LineWidth',1 ...
+%             ,'DisplayName',fileDesc ...
+%             ,'Color',startupColor{iFile} ); 
+        
+        
     end
-
-
 
 return;
 end
@@ -249,8 +275,8 @@ function [outData] = getADOutData ( data, columnTitles, BlOutNd )
                     end
 
                     if foundIt
-                        outData{iFile}.blade(i_nodes) = str2double( lc_titles{i}(2) );
-                        outData{iFile}.node(i_nodes)  = BlOutNd{iFile}( str2double( lc_titles{i}(4) ));
+                        outData{iFile}.blade(i_nodes) = str2double( AD15Node(2) );
+                        outData{iFile}.node(i_nodes)  = BlOutNd{iFile}( str2double( AD15Node(4) ));
                         outData{iFile}.alpha{i_nodes} = data{iFile}(:,i);
                         i_nodes = i_nodes + 1;
                     end         
