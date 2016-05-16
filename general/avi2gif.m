@@ -29,7 +29,7 @@ function avi2gif(aviFileName, gifFileName, StartIndx)
         % make sure gif file name ends in .gif; add a new extension if
         % it doesn't:
     [~, ~, ext] = fileparts(gifFileName);
-    if ~strcmpi(ext,'gif')
+    if ~strcmpi(ext,'.gif')
         gifFileName = [gifFileName '.gif'];
     end
 
