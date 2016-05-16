@@ -1,4 +1,6 @@
 function [] = saveFigureAsPNG( f, outPNGName, ReferenceFile )
+% (c) 2016 Bonnie Jonkman @NREL
+%
 % This routine saves the a figure as a 150-dpi PNG file.
 %
 % saveFigureAsPNG( f, outPNGName ) saves figure f to a file named
