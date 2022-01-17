@@ -2,7 +2,7 @@ function [velocity, alpha_h, alpha_v] = RotateVelocityComponents( velocity, alph
 %
 % Input:
 %   velocity(time,component,iy,iz)
-%       - aligned with geographical x-y-z coordinates
+%       - aligned with inertial X-Y-Z coordinates
 %   alpha_h_in(1:nz) (optional)
 %       - horizontal angle, in degrees, specified at each height 
 %   alpha_v (optional)
@@ -34,12 +34,12 @@ if nargin > 1
     if length(alpha_h_in) == nz
         alpha_h = alpha_h_in;
     else
-        alpha_h(:) = alpha_h_in;
+        alpha_h = alpha_h_in(1);
     end
     if length(alpha_v_in) == nz
         alpha_v = alpha_v_in;
     else
-        alpha_v(:) = alpha_v_in;
+        alpha_v = alpha_v_in(1);
     end
 
     alpha_v = alpha_v*pi/180;
